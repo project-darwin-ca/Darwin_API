@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  postgres_db:
+    image: postgres:latest
+    container_name: PostgresCont
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=darwin
+      - POSTGRES_PASSWORD=darwin123
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_db_darwin:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=xuxant02@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=12345
+    ports:
+      - 5000:80
+volumes:
+  postgres_db_darwin:
+    driver: local

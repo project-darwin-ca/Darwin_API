@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-management
+  labels:
+    app: data-management
+    version: v0.0.1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-management
+      version: v0.0.1
+  template:
+    metadata:
+      labels:
+        app: data-management
+        version: v0.0.1
+    spec:
+      containers:
+        - name: data-management
+          image: darwin1.azurecr.io/data-management
+          ports:
+            - containerPort: 8080
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-management
+  labels:
+    app: data-management
+    version: v0.0.1
+spec:
+  type: ClusterIP
+  selector:
+    app: data-management
+    version: v0.0.1
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: http
