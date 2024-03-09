@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: data-management
-          image: darwin1.azurecr.io/data-management
+          image: darwin1.azurecr.io/darwin/data-manager
           ports:
             - containerPort: 8080
               name: http

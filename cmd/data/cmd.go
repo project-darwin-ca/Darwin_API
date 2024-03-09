@@ -3,6 +3,7 @@ package data
 import (
 	"github.com/spf13/cobra"
 	"github.com/xuxant/Darwin_API/pkg/config"
+	"github.com/xuxant/Darwin_API/pkg/db"
 	"github.com/xuxant/Darwin_API/pkg/logs"
 	"github.com/xuxant/Darwin_API/pkg/service"
 )
@@ -21,6 +22,20 @@ func runCommand() *cobra.Command {
 	return runCmd
 }
 
+func migrateCommand() *cobra.Command {
+	migrateCmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "database migration",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg := config.GetConfig()
+			db := db.GetConnection(*cfg)
+			err := db.MigrateDatabase()
+			return err
+		},
+	}
+	return migrateCmd
+}
+
 func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "data-manager",
@@ -31,5 +46,6 @@ func NewRootCommand() *cobra.Command {
 	}
 
 	rootCmd.AddCommand(runCommand())
+	rootCmd.AddCommand(migrateCommand())
 	return rootCmd
 }

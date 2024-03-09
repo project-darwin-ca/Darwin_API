@@ -11,7 +11,7 @@ type PostgresConfig struct {
 	PostgresPort             string `env:"POSTGRES_PORT" envDefault:"5432"`
 	PostgresDatabase         string `env:"POSTGRES_DATABASE" envDefault:"darwin"`
 	PostgresUser             string `env:"POSTGRES_USER" envDefault:"postgres"`
-	PostgresPassword         string `env:"POSTGRES_PASSWORD" envDefault:"postgres"`
+	PostgresPassword         string `env:"POSTGRES_PASSWORD" envDefault:"postgres123"`
 	PostgresConnectionString string
 }
 

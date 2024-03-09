@@ -1,0 +1,19 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: darwin-api
+build:
+  artifacts:
+    - image: darwin1.azurecr.io/darwin/data-manager
+      sync:
+        infer:
+          - "**/*.go"
+      kaniko:
+        dockerfile: Dockerfile
+  cluster:
+    namespace: build
+#    dockerConfig:
+#      path: ~/.docker/kaniko.json
+manifests:
+  rawYaml:
+    - dev/deployment.yaml
