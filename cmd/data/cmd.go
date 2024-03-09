@@ -28,8 +28,8 @@ func migrateCommand() *cobra.Command {
 		Short: "database migration",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := config.GetConfig()
-			db := db.GetConnection(*cfg)
-			err := db.MigrateDatabase()
+			dbconn := db.GetConnection(*cfg)
+			err := db.MigrateDatabase(dbconn)
 			return err
 		},
 	}

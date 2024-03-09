@@ -1,0 +1,87 @@
+version: v2beta1
+name: darwinapigit
+
+# This is a list of `pipelines` that DevSpace can execute (you can define your own)
+pipelines:
+  # This is the pipeline for the main command: `devspace dev` (or `devspace run-pipeline dev`)
+  dev:
+    run: |-
+      run_dependencies --all       # 1. Deploy any projects this project needs (see "dependencies")
+      ensure_pull_secrets --all    # 2. Ensure pull secrets
+      create_deployments --all     # 3. Deploy Helm charts and manifests specfied as "deployments"
+      start_dev app                # 4. Start dev mode "app" (see "dev" section)
+  # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
+  deploy:
+    run: |-
+      run_dependencies --all                            # 1. Deploy any projects this project needs (see "dependencies")
+      ensure_pull_secrets --all                         # 2. Ensure pull secrets
+      build_images --all -t $(git describe --always)    # 3. Build, tag (git commit hash) and push all images (see "images")
+      create_deployments --all                          # 4. Deploy Helm charts and manifests specfied as "deployments"
+
+# This is a list of `images` that DevSpace can build for this project
+# We recommend to skip image building during development (devspace dev) as much as possible
+images:
+  app:
+    image: darwin1.azurecr.io/darwin/data-manager
+    dockerfile: ./Dockerfile
+
+# This is a list of `deployments` that DevSpace can create for this project
+deployments:
+  app:
+    # This deployment uses `kubectl` but you can also define `helm` deployments
+    kubectl:
+      manifests:
+        - dev/deployment.yaml
+
+# This is a list of `dev` containers that are based on the containers created by your deployments
+dev:
+  app:
+    imageSelector: darwin1.azurecr.io/darwin/data-manager
+    devImage: darwin1.azurecr.io/darwin/go:1.22.1-alpine
+    env:
+      - name: POSTGRES_USER
+        value: postgres
+      - name: POSTGRES_PASSWORD
+        value: ""
+      - name: POSTGRES_HOST
+        value: postgres.db
+      - name: AWS_REGION
+        value: us-east-1
+      - name: CLERK_AUTHENTICATION
+        value: "true"
+      - name: CLERK_SECRET_KEY
+        value: ""
+    sync:
+      - path: ./
+    terminal:
+      command: ./devspace_start.sh
+    ssh:
+      enabled: true
+    # Make the following commands from my local machine available inside the dev container
+    proxyCommands:
+      - command: devspace
+      - command: kubectl
+      - command: helm
+      - gitCredentials: true
+    # Forward the following ports to be able access your application via localhost
+    ports:
+      - port: "2345"
+      - port: "8080"
+    # Open the following URLs once they return an HTTP status code other than 502 or 503
+    open:
+      - url: http://localhost:8080
+
+# Use the `commands` section to define repeatable dev workflows for this project 
+commands:
+  migrate-db:
+    command: |-
+      echo 'This is a cross-platform, shared command that can be used to codify any kind of dev task.'
+      echo 'Anyone using this project can invoke it via "devspace run migrate-db"'
+
+# Define dependencies to other projects with a devspace.yaml
+# dependencies:
+#   api:
+#     git: https://...  # Git-based dependencies
+#     tag: v1.0.0
+#   ui:
+#     path: ./ui        # Path-based dependencies (for monorepos)

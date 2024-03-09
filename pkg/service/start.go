@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/clerk/clerk-sdk-go/v2"
+	"github.com/clerk/clerk-sdk-go/v2/jwks"
 	glog "github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -27,6 +29,14 @@ func InitGinEngine(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine 
 				return l.Output(gin.DefaultWriter).With().Logger()
 			}),
 			))
+	}
+
+	if cfg.ClerkAuthentication {
+		clerk.SetKey(cfg.ClerkSecretKey)
+		clientConfig := &clerk.ClientConfig{}
+		clientConfig.Key = &cfg.ClerkSecretKey
+		jwksClient := jwks.NewClient(clientConfig)
+		middlewareList = append(middlewareList, authHandlerMiddleware(jwksClient))
 	}
 
 	g := gin.New()

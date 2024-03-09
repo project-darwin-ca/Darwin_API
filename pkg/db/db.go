@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	lg "github.com/rs/zerolog/log"
 	"github.com/xuxant/Darwin_API/pkg/config"
 	"github.com/xuxant/Darwin_API/pkg/models"
@@ -10,30 +9,19 @@ import (
 	"log"
 )
 
-var Db DBConnection
-
-func GetConnection(cfg config.ServiceConfig) DBConnection {
+func GetConnection(cfg config.ServiceConfig) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(cfg.PostgresConnectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return DBConnection{
-		Db: db,
-	}
+	return db
 }
 
-func (db *DBConnection) MigrateDatabase() error {
+func MigrateDatabase(db *gorm.DB) error {
 	lg.Info().Msg("Initialing migration...")
 	lg.Info().Msg("Migrating metadata")
-	err := db.Db.AutoMigrate(&models.DataMetadata{})
-	if err != nil {
-		return fmt.Errorf("migrating table datametadata: %w", err)
-	}
+	_ = db.AutoMigrate(&models.CloudCredentials{}, &models.DataMetadata{})
 	lg.Info().Msg("Migrating data source")
-	err = db.Db.AutoMigrate(&models.DataSource{})
-	if err != nil {
-		return fmt.Errorf("migrating table datasource: %w", err)
-	}
 
 	return nil
 }

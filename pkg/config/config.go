@@ -25,10 +25,12 @@ type Log struct {
 }
 
 type ServiceConfig struct {
-	ServiceID       string `env:"SERVICE_ID" envDefault:"data-import"`
-	Port            int    `env:"PORT" envDefault:"8080"`
-	Profile         string `env:"PROFILE" envDefault:"local"`
-	ShutdownTimeout int    `env:"SHUTDOWN_TIMEOUT" endDefault:"3"`
+	ServiceID           string `env:"SERVICE_ID" envDefault:"data-import"`
+	Port                int    `env:"PORT" envDefault:"8080"`
+	Profile             string `env:"PROFILE" envDefault:"local"`
+	ShutdownTimeout     int    `env:"SHUTDOWN_TIMEOUT" endDefault:"3"`
+	ClerkAuthentication bool   `env:"CLERK_AUTHENTICATION" envDefault:"true"`
+	ClerkSecretKey      string `env:"CLERK_SECRET_KEY"`
 	PostgresConfig
 	Admin
 	Log

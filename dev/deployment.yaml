@@ -20,6 +20,13 @@ spec:
       containers:
         - name: data-management
           image: darwin1.azurecr.io/darwin/data-manager
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres123
+            - name: POSTGRES_HOST
+              value: postgres.db
           ports:
             - containerPort: 8080
               name: http
@@ -40,3 +47,23 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: http
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: data-management
+spec:
+  hosts:
+    - data-manager.aks.mixerml.com
+  gateways:
+    - istio-system/common-gw
+    - mesh
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            port:
+              number: 8080
+            host: data-management

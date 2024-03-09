@@ -10,6 +10,8 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o data-manager cmd/data-management.go
 
+CMD ["go", "run", "cmd/data-management.go", "run"]
+
 FROM alpine
 
 COPY --from=builder /app/data-manager /data-manager

@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"context"
-	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
@@ -28,8 +26,18 @@ func NewNotFoundError(message string) *RestError {
 	}
 }
 
-func GinContextToGenericContext(ctx *gin.Context) context.Context {
-	nCtx := context.Background()
-	nCtx = context.WithValue(nCtx, "request", ctx.Request)
-	return nCtx
+func NewInternalServerError(message string) *RestError {
+	return &RestError{
+		Message: message,
+		Status:  http.StatusInternalServerError,
+		Error:   "internal_server_error",
+	}
+}
+
+func NewUnauthorizedError(message string) *RestError {
+	return &RestError{
+		Message: message,
+		Status:  http.StatusUnauthorized,
+		Error:   "error_unauthorized",
+	}
 }

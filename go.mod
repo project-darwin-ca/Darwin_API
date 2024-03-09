@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.20
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.9
 	github.com/caarlos0/env/v6 v6.10.1
+	github.com/clerk/clerk-sdk-go/v2 v2.0.2-beta.3
 	github.com/gin-contrib/logger v1.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.6.0
@@ -43,6 +44,7 @@ require (
 	github.com/ebitengine/purego v0.6.0-alpha.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.18.0 // indirect

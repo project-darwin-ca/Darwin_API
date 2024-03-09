@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ValidateCredentials(accessKey, secret string) error {
+func ValidateCredentials(accessKey, secret string) (*string, error) {
 	ctx := context.TODO()
 	awsCfg, err := config.LoadDefaultConfig(ctx,
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
@@ -19,14 +19,14 @@ func ValidateCredentials(accessKey, secret string) error {
 			},
 		}))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client := sts.NewFromConfig(awsCfg)
 	identity, err := client.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.Debug().Msgf("Caller Identity: %s", *identity.Account)
-	return nil
+	return identity.Account, nil
 }

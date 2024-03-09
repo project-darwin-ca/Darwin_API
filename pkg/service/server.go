@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/xuxant/Darwin_API/pkg/config"
-	"github.com/xuxant/Darwin_API/pkg/routes"
+	"github.com/xuxant/Darwin_API/pkg/db"
+	"github.com/xuxant/Darwin_API/pkg/handlers"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"net/http"
 	"os"
@@ -34,10 +35,13 @@ func NewHttpServer(cfg config.ServiceConfig, ginEngine *gin.Engine, logger zerol
 }
 
 func NewGin(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine {
+	dbConn := db.GetConnection(cfg)
+
+	handler := handlers.NewDataHandler(dbConn)
 	g := InitGinEngine(cfg, logger)
 	group := g.Group(apiGroup(cfg))
 	AddHealthCheckRoute(group)
-	group.POST("/registerProvider", routes.RegisterAWS)
+	group.POST("/registerProvider", handler.RegisterAWS)
 	return g
 }
 
