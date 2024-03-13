@@ -16,4 +16,6 @@ FROM alpine
 
 COPY --from=builder /app/data-manager /data-manager
 
-CMD ["./data-manager migrate && ./data-manager run"]
+COPY entrypoint.sh .
+
+ENTRYPOINT ["/entrypoint.sh"]
