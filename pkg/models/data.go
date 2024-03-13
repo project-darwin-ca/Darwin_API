@@ -1,20 +1,19 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
+import "github.com/google/uuid"
 
 type CloudCredentials struct {
-	UserId          string `gorm:"primaryKey" json:"user_id,omitempty"`
-	Provider        string `json:"cloud_provider"`
-	AccessKey       string `json:"access_key"`
-	SecretAccessKey string `json:"secret_access_key"`
-	DataMetadata    []DataMetadata
+	UserId          string         `gorm:"primaryKey;default:null" json:"user_id,omitempty"`
+	Provider        string         `json:"cloud_provider"`
+	AccessKey       string         `json:"access_key"`
+	SecretAccessKey string         `json:"secret_access_key"`
+	DataMetadata    []DataMetadata `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type DataMetadata struct {
-	gorm.Model
-	BucketName string `json:"bucket_name"`
-	ObjectKey  string `json:"object_key"`
+	DataId     uuid.UUID `gron:"primaryKey"`
+	BucketName string
+	ObjectKey  string
+	FileName   string
 	UserId     string
 }

@@ -42,7 +42,7 @@ dev:
       - name: POSTGRES_USER
         value: postgres
       - name: POSTGRES_PASSWORD
-        value: ""
+        value: postgres123
       - name: POSTGRES_HOST
         value: postgres.db
       - name: AWS_REGION
@@ -50,7 +50,7 @@ dev:
       - name: CLERK_AUTHENTICATION
         value: "true"
       - name: CLERK_SECRET_KEY
-        value: ""
+        value: sk_test_ksaFkPD2NcCm1YWgkfEYpYSQJlW5CnA0OhMLUJotEV
     sync:
       - path: ./
     terminal:

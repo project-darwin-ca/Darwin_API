@@ -16,13 +16,13 @@ func authHandlerMiddleware(client *jwks.Client) gin.HandlerFunc {
 			Token:      sessionToken,
 			JWKSClient: client,
 		})
-		c.Set("user", sessionClaim.Subject)
 		if err != nil {
 			restError := utils.NewUnauthorizedError(err.Error())
 			c.JSON(restError.Status, restError)
 			c.Abort()
 			return
 		}
+		c.Set("user", sessionClaim.Subject)
 
 		c.Next()
 	}

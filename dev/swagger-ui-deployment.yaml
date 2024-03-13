@@ -1,0 +1,492 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swagger-ui
+  labels:
+    app: swagger-ui
+    version: v0.0.1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swagger-ui
+      version: v0.0.1
+  template:
+    metadata:
+      labels:
+        app: swagger-ui
+        version: v0.0.1
+    spec:
+      containers:
+        - name: swagger-ui
+          image: darwin1.azurecr.io/darwin/swagger-ui:v5
+          volumeMounts:
+            - name: swagger
+              mountPath: /swagger.json
+              subPath: swagger.json
+          env:
+            - name: SWAGGER_JSON
+              value: /swagger.json
+          ports:
+            - containerPort: 8080
+              name: http
+      volumes:
+        - name: swagger
+          configMap:
+            name: swagger-specification
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swagger-ui
+  labels:
+    app: swagger-ui
+    version: v0.0.1
+spec:
+  type: ClusterIP
+  selector:
+    app: swagger-ui
+    version: v0.0.1
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: http
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: swagger-ui
+spec:
+  hosts:
+    - swagger.aks.mixerml.com
+  gateways:
+    - istio-system/common-gw
+    - mesh
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            port:
+              number: 8080
+            host: swagger-ui
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swagger-specification
+data:
+  swagger.json: |
+    {
+      "openapi": "3.0.0",
+      "info": {
+        "title": "Data Management API",
+        "description": "Data Management API",
+        "contact": {
+          "email": "xuxant02@gmail.com"
+        },
+        "version": "1.0.0"
+      },
+      "servers": [
+        {
+          "url": "https://data-manager.aks.mixerml.com",
+          "description": "Localhost Server"
+        }
+      ],
+      "tags": [
+        {
+          "name": "developers",
+          "description": "Operations available to regular developers"
+        }
+      ],
+      "paths": {
+        "/registerProvider/updateCredentials": {
+          "post": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Update Cloud Credentials",
+            "description": "By passing the cloud provider information, you can update the credentials associated to your account.\n",
+            "operationId": "updateCredentials",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CloudCredentials"
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Response Code for Credentials Update.",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/inline_response_201"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        },
+        "/registerProvider": {
+          "post": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Register Cloud Provider",
+            "description": "By passing the cloud provider information, you will be able to connect to object storage provided by that cloud\n",
+            "operationId": "registerProvider",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CloudCredentials"
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Cloud Storage Bind Successful",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/CloudCredentialsResponse"
+                    }
+                  }
+                }
+              },
+              "400": {
+                "description": "bad input request",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/CloudCredentialsError"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        },
+        "/fetchBuckets": {
+          "get": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Fetch all the buckets associated with User",
+            "description": "Users will be able to fetch all the buckets associated with Credentials binded to users id.\n",
+            "operationId": "fetchBuckets",
+            "responses": {
+              "200": {
+                "description": "Fetch buckets of user",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/BucketResponse"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        },
+        "/fetchObjects/{bucketName}": {
+          "get": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Fetch All the objects key within the bucket",
+            "description": "Fetch Objects given the bucket selected by user\n",
+            "operationId": "fetchBucket",
+            "parameters": [
+              {
+                "name": "bucketName",
+                "in": "path",
+                "description": "Name of bucket",
+                "required": true,
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Fetch objects in user's bucket",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ObjectResponse"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        },
+        "/fetchFiles": {
+          "get": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Fetch Mounted Files",
+            "description": "Fetch all the files Mounted for analysis\n",
+            "operationId": "fetchFiles",
+            "responses": {
+              "200": {
+                "description": "Fetch list of mounted files",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/FilesResponse"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        },
+        "/mountDataFiles": {
+          "post": {
+            "tags": [
+              "developers"
+            ],
+            "summary": "Mount the Data from S3",
+            "description": "Mount the object into data manager\n",
+            "operationId": "mountFiles",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/FileMountRequest"
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Response for Mount Files Endpoint",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/inline_response_201"
+                    }
+                  }
+                }
+              }
+            },
+            "security": [
+              {
+                "BearerAuth": []
+              }
+            ]
+          }
+        }
+      },
+      "components": {
+        "schemas": {
+          "FileMountRequest": {
+            "type": "object",
+            "properties": {
+              "bucket_name": {
+                "type": "string",
+                "example": "test-bucket"
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "example": "file"
+                }
+              }
+            }
+          },
+          "FilesResponse": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "example": true
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FilesResponse_data"
+                }
+              }
+            }
+          },
+          "ObjectResponse": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "example": true
+              },
+              "data": {
+                "$ref": "#/components/schemas/ObjectResponse_data"
+              }
+            }
+          },
+          "BucketResponse": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "example": true
+              },
+              "data": {
+                "$ref": "#/components/schemas/BucketResponse_data"
+              }
+            }
+          },
+          "CloudCredentials": {
+            "required": [
+              "access_key",
+              "provider",
+              "secret_access_key"
+            ],
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "example": "aws"
+              },
+              "access_key": {
+                "type": "string",
+                "example": "AKIAIOSFODNN7EXAMPLE"
+              },
+              "secret_access_key": {
+                "type": "string",
+                "example": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+              }
+            }
+          },
+          "CloudCredentialsResponse": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "example": true
+              },
+              "data": {
+                "$ref": "#/components/schemas/CloudCredentialsResponse_data"
+              }
+            }
+          },
+          "CloudCredentialsError": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "operation error STS"
+              },
+              "status": {
+                "type": "number",
+                "example": 400
+              },
+              "error": {
+                "type": "string",
+                "example": "bad_request"
+              }
+            }
+          },
+          "inline_response_201": {
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          "FilesResponse_data": {
+            "type": "object",
+            "properties": {
+              "data_id": {
+                "type": "string",
+                "default": "8dc0033f-23d5-4a32-981d-83c5b6fb146a"
+              },
+              "file_name": {
+                "type": "string",
+                "default": "data.csv"
+              }
+            }
+          },
+          "ObjectResponse_data": {
+            "type": "object",
+            "properties": {
+              "bucket": {
+                "type": "string",
+                "example": "test-bucket"
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "example": "object/key/data.csv"
+                }
+              }
+            }
+          },
+          "BucketResponse_data": {
+            "type": "object",
+            "properties": {
+              "buckets": {
+                "type": "array",
+                "items": {
+                  "example": "data-bucket"
+                }
+              }
+            }
+          },
+          "CloudCredentialsResponse_data": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "example": "aws"
+              },
+              "identity": {
+                "type": "string",
+                "example": "12343"
+              }
+            }
+          }
+        },
+        "securitySchemes": {
+          "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer"
+          }
+        }
+      }
+    }

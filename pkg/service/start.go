@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func InitGinEngine(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine {
+func InitGinEngine(cfg config.ServiceConfig, logger zerolog.Logger) (*gin.Engine, []gin.HandlerFunc) {
 	middlewareList := []gin.HandlerFunc{
 		gin.Recovery(),
 		gintrace.Middleware(cfg.ServiceID),
@@ -41,8 +41,7 @@ func InitGinEngine(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine 
 
 	g := gin.New()
 	middlewares := CombineMiddlewares(middlewareList)
-	g.Use(middlewares...)
-	return g
+	return g, middlewares
 }
 
 func CombineMiddlewares(middlewareList ...[]gin.HandlerFunc) []gin.HandlerFunc {

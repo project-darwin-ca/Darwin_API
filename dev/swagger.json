@@ -1,0 +1,267 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Data Management API",
+    "description": "Darwin Data Management API",
+    "contact": {
+      "email": "xuxant02@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://data-manager.aks.mixerml.com",
+      "description": "SwaggerHub API Auto Mocking"
+    }
+  ],
+  "tags": [
+    {
+      "name": "developers",
+      "description": "Operations available to regular developers"
+    }
+  ],
+  "paths": {
+    "/registerProvider": {
+      "post": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Register Cloud Provider",
+        "description": "By passing the cloud provider information, you will be able to connect to object storage provided by that cloud\n",
+        "operationId": "registerProvider",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloudCredentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cloud Storage Bind Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloudCredentialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad input request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloudCredentialsError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/fetchBuckets": {
+      "get": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Fetch all the buckets associated with User",
+        "description": "Users will be able to fetch all the buckets associated with Credentials binded to users id.\n",
+        "operationId": "fetchBuckets",
+        "responses": {
+          "200": {
+            "description": "Fetch buckets of user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BucketResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/fetchObjects/{bucketName}": {
+      "get": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Fetch All the objects key within the bucket",
+        "description": "Fetch Objects given the bucket selected by user\n",
+        "operationId": "fetchBucket",
+        "parameters": [
+          {
+            "name": "bucketName",
+            "in": "path",
+            "description": "Name of bucket",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetch objects in user's bucket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ObjectResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ObjectResponse_data"
+          }
+        }
+      },
+      "BucketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/BucketResponse_data"
+          }
+        }
+      },
+      "CloudCredentials": {
+        "required": [
+          "access_key",
+          "id",
+          "provider",
+          "secret_access_key"
+        ],
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "example": "aws"
+          },
+          "access_key": {
+            "type": "string",
+            "example": "AKIAIOSFODNN7EXAMPLE"
+          },
+          "secret_access_key": {
+            "type": "string",
+            "example": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          }
+        }
+      },
+      "CloudCredentialsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CloudCredentialsResponse_data"
+          }
+        }
+      },
+      "CloudCredentialsError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "operation error STS"
+          },
+          "status": {
+            "type": "number",
+            "example": 400
+          },
+          "error": {
+            "type": "string",
+            "example": "bad_request"
+          }
+        }
+      },
+      "ObjectResponse_data": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "example": "test-bucket"
+          },
+          "objects": {
+            "type": "array",
+            "items": {
+              "example": "object/key/data.csv"
+            }
+          }
+        }
+      },
+      "BucketResponse_data": {
+        "type": "object",
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "example": "data-bucket"
+            }
+          }
+        }
+      },
+      "CloudCredentialsResponse_data": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "example": "aws"
+          },
+          "identity": {
+            "type": "string",
+            "example": "12343"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

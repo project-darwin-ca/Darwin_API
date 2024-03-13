@@ -38,10 +38,16 @@ func NewGin(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine {
 	dbConn := db.GetConnection(cfg)
 
 	handler := handlers.NewDataHandler(dbConn)
-	g := InitGinEngine(cfg, logger)
-	group := g.Group(apiGroup(cfg))
-	AddHealthCheckRoute(group)
-	group.POST("/registerProvider", handler.RegisterAWS)
+	g, handleFuncs := InitGinEngine(cfg, logger)
+	apiGroup := g.Group(apiGroup(cfg)).Use(handleFuncs...)
+	healthGroup := g.Group("/")
+	AddHealthCheckRoute(healthGroup)
+	apiGroup.POST("/registerProvider", handler.RegisterAWS)
+	apiGroup.GET("/fetchBuckets", handler.GetAllBuckets)
+	apiGroup.GET("/fetchObjects/:bucketName", handler.GetAllObjectsFromBucket)
+	apiGroup.POST("/mountDataFiles", handler.MountDataObject)
+	apiGroup.GET("/fetchFiles", handler.FetchMountedFiles)
+	apiGroup.POST("/registerProvider/updateCredentials", handler.UpdateCloudCredentials)
 	return g
 }
 
