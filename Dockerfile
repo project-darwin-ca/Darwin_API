@@ -12,26 +12,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o data-manager cmd/data-management.go
 
 CMD ["go", "run", "cmd/data-management.go", "run"]
 
-FROM alpine as swagger
-
-WORKDIR /app
-
-RUN apk add unzip wget curl
-
-RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.11.10.zip
-
-RUN unzip v5.11.10.zip
-
-RUN sed
-
 FROM alpine
 
 COPY --from=builder /app/data-manager /data-manager
 
-<<<<<<< Updated upstream
-COPY --from=swagger /app/swagger-ui-5.11.10/dist /app/
-
-CMD ["/data-manager", "run"]
-=======
 CMD ["./data-manager migrate && ./data-manager run"]
->>>>>>> Stashed changes
