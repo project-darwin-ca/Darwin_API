@@ -28,6 +28,10 @@ FROM alpine
 
 COPY --from=builder /app/data-manager /data-manager
 
+<<<<<<< Updated upstream
 COPY --from=swagger /app/swagger-ui-5.11.10/dist /app/
 
 CMD ["/data-manager", "run"]
+=======
+CMD ["./data-manager migrate && ./data-manager run"]
+>>>>>>> Stashed changes
