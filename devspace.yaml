@@ -51,6 +51,8 @@ dev:
         value: "true"
       - name: CLERK_SECRET_KEY
         value: sk_test_ksaFkPD2NcCm1YWgkfEYpYSQJlW5CnA0OhMLUJotEV
+      - name: ENABLE_SWAGGER
+        value: "true"
     sync:
       - path: ./
     terminal:

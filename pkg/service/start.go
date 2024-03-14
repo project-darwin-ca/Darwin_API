@@ -60,6 +60,10 @@ func AddHealthCheckRoute(group *gin.RouterGroup) gin.IRoutes {
 	})
 }
 
+func addSwaggerRoute(group *gin.RouterGroup) gin.IRoutes {
+	return group.Static("/swagger", "/opt/swagger")
+}
+
 func panicHandlerMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

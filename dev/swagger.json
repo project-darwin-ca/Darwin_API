@@ -2,20 +2,20 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Data Management API",
-    "description": "Darwin Data Management API",
+    "description": "Data Management API",
     "contact": {
       "email": "xuxant02@gmail.com"
-    },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://data-manager.aks.mixerml.com",
+      "url": "https://virtserver.swaggerhub.com/sushant4/data-manager/1.0.0",
       "description": "SwaggerHub API Auto Mocking"
+    },
+    {
+      "url": "https://data-manager.aks.mixerml.com",
+      "description": "Localhost Server"
     }
   ],
   "tags": [
@@ -25,6 +25,42 @@
     }
   ],
   "paths": {
+    "/registerProvider/updateCredentials": {
+      "post": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Update Cloud Credentials",
+        "description": "By passing the cloud provider information, you can update the credentials associated to your account.\n",
+        "operationId": "updateCredentials",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloudCredentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Response Code for Credentials Update.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_201"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/registerProvider": {
       "post": {
         "tags": [
@@ -137,10 +173,103 @@
           }
         ]
       }
+    },
+    "/fetchFiles": {
+      "get": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Fetch Mounted Files",
+        "description": "Fetch all the files Mounted for analysis\n",
+        "operationId": "fetchFiles",
+        "responses": {
+          "200": {
+            "description": "Fetch list of mounted files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/mountDataFiles": {
+      "post": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "Mount the Data from S3",
+        "description": "Mount the object into data manager\n",
+        "operationId": "mountFiles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileMountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Response for Mount Files Endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_201"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "FileMountRequest": {
+        "type": "object",
+        "properties": {
+          "bucket_name": {
+            "type": "string",
+            "example": "test-bucket"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "example": "file"
+            }
+          }
+        }
+      },
+      "FilesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilesResponse_data"
+            }
+          }
+        }
+      },
       "ObjectResponse": {
         "type": "object",
         "properties": {
@@ -168,7 +297,6 @@
       "CloudCredentials": {
         "required": [
           "access_key",
-          "id",
           "provider",
           "secret_access_key"
         ],
@@ -214,6 +342,27 @@
           "error": {
             "type": "string",
             "example": "bad_request"
+          }
+        }
+      },
+      "inline_response_201": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "FilesResponse_data": {
+        "type": "object",
+        "properties": {
+          "data_id": {
+            "type": "string",
+            "default": "8dc0033f-23d5-4a32-981d-83c5b6fb146a"
+          },
+          "file_name": {
+            "type": "string",
+            "default": "data.csv"
           }
         }
       },

@@ -42,6 +42,9 @@ func NewGin(cfg config.ServiceConfig, logger zerolog.Logger) *gin.Engine {
 	apiGroup := g.Group(apiGroup(cfg)).Use(handleFuncs...)
 	healthGroup := g.Group("/")
 	AddHealthCheckRoute(healthGroup)
+	if cfg.SwaggerEnable {
+		addSwaggerRoute(healthGroup)
+	}
 	apiGroup.POST("/registerProvider", handler.RegisterAWS)
 	apiGroup.GET("/fetchBuckets", handler.GetAllBuckets)
 	apiGroup.GET("/fetchObjects/:bucketName", handler.GetAllObjectsFromBucket)

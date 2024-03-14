@@ -31,6 +31,7 @@ type ServiceConfig struct {
 	ShutdownTimeout     int    `env:"SHUTDOWN_TIMEOUT" endDefault:"3"`
 	ClerkAuthentication bool   `env:"CLERK_AUTHENTICATION" envDefault:"true"`
 	ClerkSecretKey      string `env:"CLERK_SECRET_KEY"`
+	SwaggerEnable       bool   `env:"ENABLE_SWAGGER" envDefault:"false"`
 	PostgresConfig
 	Admin
 	Log
