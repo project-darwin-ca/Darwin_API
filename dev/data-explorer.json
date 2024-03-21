@@ -1,0 +1,160 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API for the Darwin Data Explorer within the Darwin API platform, initially starting with bio.tools integration.",
+    "version": "1.0.0",
+    "title": "Darwin Data Explorer API"
+  },
+  "host": "darwincloud.xyz",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "dataexplorer",
+      "description": "Operations for exploring genomic datasets and articles"
+    }
+  ],
+  "schemes": ["https"],
+  "paths": {
+    "/dataexplorer": {
+      "post": {
+        "tags": ["dataexplorer"],
+        "summary": "Search datasets and articles with specific criteria",
+        "description": "Allows users to send specific query parameters or filters in the request body to narrow down their search.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "searchCriteria",
+            "description": "Criteria to search for datasets or articles",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SearchCriteria"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results matching criteria",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ArticleDataset"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["dataexplorer"],
+        "summary": "Retrieve articles and datasets",
+        "description": "Users can retrieve articles or datasets based on query parameters appended to the URL.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Unique identifier of the article or dataset",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the article or dataset",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "subject",
+            "in": "query",
+            "description": "Subject associated with the article or dataset",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "description": "Domain associated with the article or dataset",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "Keyword associated with the article or dataset",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An article or dataset matching the query parameters",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ArticleDataset"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ArticleDataset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "unique-article-dataset-id"
+        },
+        "name": {
+          "type": "string",
+          "example": "Genome Sequencing: Techniques and Applications"
+        },
+        "subject": {
+          "type": "string",
+          "example": "Genomics"
+        },
+        "domain": {
+          "type": "string",
+          "example": "Biology"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": ["DNA sequencing", "genome analysis"]
+        },
+        "url": {
+          "type": "string",
+          "format": "url",
+          "example": "https://bio.tools/genome_sequencing_app"
+        }
+      }
+    },
+    "SearchCriteria": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Genome Sequencing"
+        },
+        "subject": {
+          "type": "string",
+          "example": "Genomics"
+        },
+        "domain": {
+          "type": "string",
+          "example": "Biology"
+        },
+        "keyword": {
+          "type": "string",
+          "example": "DNA"
+        }
+      }
+    }
+  }
+}
