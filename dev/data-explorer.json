@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "title": "Darwin Data Explorer API"
   },
-  "host": "darwincloud.xyz",
+  "host": "darwinbio.io",
   "basePath": "/api/v1",
   "tags": [
     {
